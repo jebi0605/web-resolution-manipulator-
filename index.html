@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
   <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Custom Web Viewer</title>
     <style>
       body {
@@ -38,11 +40,29 @@
     <div id="viewerContainer"></div>
 
     <script>
+      function setUserAgent(window, userAgent) {
+        // 사용자가 에이전트를 변경하려면 브라우저 보안 정책을 고려해야 함
+        if (window.navigator.userAgent !== userAgent) {
+          const userAgentProp = { get: () => userAgent };
+          try {
+            Object.defineProperty(window.navigator, 'userAgent', userAgentProp);
+          } catch (e) {
+            window.navigator = Object.create(navigator, {
+              userAgent: userAgentProp
+            });
+          }
+        }
+      }
+
       function loadPage() {
         const url = document.getElementById('urlInput').value;
         const resolution = document.getElementById('resolutionSelect').value;
         const [width, height] = resolution.split('x').map(Number);
         const scale = window.innerWidth / width;
+
+        // 특정 사용자 에이전트로 변경하려는 시도
+        const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36';
+        setUserAgent(window, userAgent);
 
         document.getElementById('viewerContainer').innerHTML = `
           <iframe id="viewer"
