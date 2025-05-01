@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Custom Web Viewer</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #111;
+        color: #eee;
+      }
+      input, select, button {
+        margin: 5px;
+        padding: 8px;
+        font-size: 16px;
+      }
+      #viewer {
+        margin-top: 20px;
+        overflow: hidden;
+        border: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>데스크탑 뷰포트 웹 뷰어</h2>
+    <label>URL: <input type="text" id="urlInput" placeholder="https://wrtn.io/create"></label><br>
+    <label>해상도 선택: 
+      <select id="resolutionSelect">
+        <option value="1920x1080">1920x1080 (기본)</option>
+        <option value="1366x768">1366x768</option>
+        <option value="1440x900">1440x900</option>
+        <option value="2560x1440">2560x1440</option>
+      </select>
+    </label>
+    <button onclick="loadPage()">페이지 열기</button>
+
+    <div id="viewerContainer"></div>
+
+    <script>
+      function loadPage() {
+        const url = document.getElementById('urlInput').value;
+        const resolution = document.getElementById('resolutionSelect').value;
+        const [width, height] = resolution.split('x').map(Number);
+        const scale = window.innerWidth / width;
+
+        document.getElementById('viewerContainer').innerHTML = `
+          <iframe id="viewer"
+            src="${url}"
+            width="${width}"
+            height="${height}"
+            style="transform: scale(${scale}); transform-origin: top left; border:none;">
+          </iframe>`;
+      }
+    </script>
+  </body>
+</html>
