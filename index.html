@@ -1,14 +1,12 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>데스크탑 모드 실행기</title>
+  <title>데스크탑 모드 시뮬레이터</title>
   <style>
-    body, html {
-      margin: 0;
-      padding: 0;
+    html, body {
       height: 100%;
+      margin: 0;
     }
     iframe {
       width: 100%;
@@ -18,14 +16,12 @@
   </style>
 </head>
 <body>
-  <iframe id="desktopFrame" src=""></iframe>
+  <iframe id="desktopFrame" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
 
   <script>
-    const link = prompt("실행할 링크를 입력하세요 (https:// 포함)");
+    const link = prompt("열고 싶은 링크 입력 (https:// 포함)");
     if (link && link.startsWith("http")) {
-      // 프록시 서버를 통해 중계
-      const proxyUrl = `https://your-proxy.vercel.app?url=${encodeURIComponent(link)}`;
-      document.getElementById("desktopFrame").src = proxyUrl;
+      document.getElementById("desktopFrame").src = link;
     } else {
       alert("올바른 링크를 입력하세요.");
     }
