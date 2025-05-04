@@ -1,77 +1,21 @@
-<!DOCTYPE html>
-<html lang="ko">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Web Viewer</title>
-    <style>
-      body {
-        font-family: sans-serif;
-        margin: 0;
-        padding: 20px;
-        background-color: #111;
-        color: #eee;
-      }
-      input, select, button {
-        margin: 5px;
-        padding: 8px;
-        font-size: 16px;
-      }
-      #viewer {
-        margin-top: 20px;
-        overflow: hidden;
-        border: none;
-      }
-    </style>
-  </head>
-  <body>
-    <h2>데스크탑 뷰포트 웹 뷰어</h2>
-    <label>URL: <input type="text" id="urlInput" placeholder="https://your_site"></label><br>
-    <label>해상도 선택: 
-      <select id="resolutionSelect">
-        <option value="1920x1080">1920x1080 (기본)</option>
-        <option value="1366x768">1366x768</option>
-        <option value="1440x900">1440x900</option>
-        <option value="2560x1440">2560x1440</option>
-      </select>
-    </label>
-    <button onclick="loadPage()">페이지 열기</button>
+export default async function handler(req, res) {
+  const targetUrl = req.query.url;
+  if (!targetUrl) {
+    return res.status(400).send("URL 필요");
+  }
 
-    <div id="viewerContainer"></div>
-
-    <script>
-      function setUserAgent(window, userAgent) {
-        // 사용자가 에이전트를 변경하려면 브라우저 보안 정책을 고려해야 함
-        if (window.navigator.userAgent !== userAgent) {
-          const userAgentProp = { get: () => userAgent };
-          try {
-            Object.defineProperty(window.navigator, 'userAgent', userAgentProp);
-          } catch (e) {
-            window.navigator = Object.create(navigator, {
-              userAgent: userAgentProp
-            });
-          }
-        }
+  try {
+    const response = await fetch(targetUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/119 Safari/537.36"
       }
+    });
 
-      function loadPage() {
-        const url = document.getElementById('urlInput').value;
-        const resolution = document.getElementById('resolutionSelect').value;
-        const [width, height] = resolution.split('x').map(Number);
-        const scale = window.innerWidth / width;
-
-        // 특정 사용자 에이전트로 변경하려는 시도
-        const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36';
-        setUserAgent(window, userAgent);
-
-        document.getElementById('viewerContainer').innerHTML = `
-          <iframe id="viewer"
-            src="${url}"
-            width="${width}"
-            height="${height}"
-            style="transform: scale(${scale}); transform-origin: top left; border:none;">
-          </iframe>`;
-      }
-    </script>
-  </body>
-</html>
+    const contentType = response.headers.get("content-type");
+    res.setHeader("Content-Type", contentType);
+    const data = await response.text();
+    res.send(data);
+  } catch (err) {
+    res.status(500).send("에러 발생: " + err.message);
+  }
+}
